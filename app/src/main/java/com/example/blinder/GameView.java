@@ -1,6 +1,8 @@
 package com.example.blinder;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,10 +11,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
+
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -41,9 +42,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int leftLine;
     private int rightLine;
 
+    private Context context;
+
     public GameView(final Context context, Point size, SensorManager sman) {
         super(context);
         this.sm = sman;
+        this.context = context;
 
         blind = sm.getDefaultSensor(Sensor.TYPE_LIGHT);
         move = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -60,7 +64,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         blindListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                //android.widget.Toast.makeText(context, Float.toString(event.values[0]), Toast.LENGTH_SHORT).show();
                 if (event.values[0] < 10) {
                     isBlinded = true;
                 } else {
@@ -84,8 +87,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
                 gravity = alpha * gravity + (1 - alpha) * event.values[1];
                 linAccl = event.values[1] - gravity;
-
-                //Log.println(10,"XD", Float.toString(linAccl));
 
                 if (linAccl > 1) {
                     goingLeft = false;
@@ -142,6 +143,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void update() {
+
+        if (points == -150) {
+
+            Activity a = (Activity) context;
+            //a.setContentView(R.layout.activity_main);
+            //surfaceDestroyed(getHolder());
+            Intent intent = new Intent(a, GameOverActivity.class);
+            a.startActivity(intent);
+
+            //surfaceDestroyed(getHolder());
+        }
+
         if (goingLeft) {
             speed = -normalSpeed;
         } else if (goingRight) {
@@ -166,6 +179,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             x = winWidth / 2;
         }
 
+
+        //zeby nie wypadal za ekran
         if (x + 100 < rightLine && x > leftLine && isBlinded) {
             points += 1;
         } else if (isBlinded) {
@@ -177,15 +192,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void draw(Canvas canvas) {
         super.draw(canvas);
         if (canvas != null) {
-            canvas.drawColor(Color.WHITE);
+            canvas.drawColor(getResources().getColor(R.color.bgColor));
             Paint paint = new Paint();
             paint.setColor(Color.rgb(153, 0, 153));
             canvas.drawRect(x, y, x + 100, y + 100, paint);
 
             Paint paint2 = new Paint();
             paint.setColor(Color.rgb(250, 0, 0));
-
-            //canvas.drawRect((int)(winHeight/2-0.1*winHeight),0,(int)((winHeight/2-0.1*winHeight)+10),winWidth,paint2);
 
             canvas.drawRect(rightLine, 0, (rightLine + 10), winHeight, paint2);
             canvas.drawRect(leftLine, 0, (leftLine - 10), winHeight, paint2);

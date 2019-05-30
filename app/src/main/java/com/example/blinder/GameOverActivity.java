@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity {
+public class GameOverActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +18,10 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_game_over);
     }
 
-    public void onPlayClick(View view) {
+    public void onPlayAgainClick(View view) {
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -30,5 +29,4 @@ public class MainActivity extends Activity {
 
         setContentView(new GameView(this, size, sensorManager));
     }
-
 }
