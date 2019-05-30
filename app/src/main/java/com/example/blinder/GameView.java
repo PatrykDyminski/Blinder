@@ -142,25 +142,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void update() {
-
+    private void checkOver() {
         if (points == -150) {
-
             Activity a = (Activity) context;
-            //a.setContentView(R.layout.activity_main);
-            //surfaceDestroyed(getHolder());
             Intent intent = new Intent(a, GameOverActivity.class);
             a.startActivity(intent);
-
-            //surfaceDestroyed(getHolder());
         }
+    }
 
+    private void checkDirection() {
         if (goingLeft) {
             speed = -normalSpeed;
+            prevGoingLeft = true;
         } else if (goingRight) {
             speed = normalSpeed;
+            prevGoingLeft = false;
         } else {
+            prevGoingLeft = true;
             speed = 0;
+        }
+    }
+
+    private void checkIn() {
+        if (x + 100 < rightLine && x > leftLine && isBlinded) {
+            points += 1;
+        } else if (isBlinded) {
+            points -= 1;
+        }
+    }
+
+    //private int prevMod=0;
+    private boolean prevGoingLeft = true;
+
+    private void modSpeed() {
+
+        int ratio = 10;
+
+        if (prevGoingLeft == true) {
+            speed -= ratio;
+        } else {
+            speed += ratio;
         }
 
         int mod = winWidth / 2 - (x + 50);
@@ -170,8 +191,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         } else {
             mod = -1;
         }
-
-        int counterSpeed = 4 * mod;
+        int counterSpeed = 2 * mod;
 
         if (!(x < 0 || x + 100 > winWidth)) {
             x += speed - counterSpeed;
@@ -180,12 +200,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
 
-        //zeby nie wypadal za ekran
-        if (x + 100 < rightLine && x > leftLine && isBlinded) {
-            points += 1;
-        } else if (isBlinded) {
-            points -= 1;
+
+        /*
+
+
+        if (!(x < 0 || x + 100 > winWidth)) {
+            x += speed - counterSpeed;
+        } else {
+            x = winWidth / 2;
         }
+
+        int ratio = 10;
+        speed -= prevMod*ratio;
+        prevMod = points/100;
+        speed += prevMod*ratio;
+        */
+
+    }
+
+    public void update() {
+        checkOver();
+        checkDirection();
+        modSpeed();
+        checkIn();
     }
 
     @Override
@@ -197,17 +234,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setColor(Color.rgb(153, 0, 153));
             canvas.drawRect(x, y, x + 100, y + 100, paint);
 
-            Paint paint2 = new Paint();
-            paint.setColor(Color.rgb(250, 0, 0));
 
-            canvas.drawRect(rightLine, 0, (rightLine + 10), winHeight, paint2);
-            canvas.drawRect(leftLine, 0, (leftLine - 10), winHeight, paint2);
+            paint.setColor(Color.rgb(0, 0, 0));
 
-            Paint paint3 = new Paint();
-            paint3.setColor(Color.BLACK);
-            paint3.setTextSize(200);
+            canvas.drawRect(rightLine, 0, (rightLine + 10), winHeight, paint);
+            canvas.drawRect(leftLine, 0, (leftLine - 10), winHeight, paint);
 
-            canvas.drawText(Integer.toString(points), 15, 200, paint3);
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(200);
+
+            canvas.drawText(Integer.toString(points), 15, 200, paint);
         }
     }
 
