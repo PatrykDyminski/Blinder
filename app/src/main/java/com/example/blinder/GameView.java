@@ -44,6 +44,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Context context;
 
+    private int health = 100;
+
     public GameView(final Context context, Point size, SensorManager sman) {
         super(context);
         this.sm = sman;
@@ -143,7 +145,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void checkOver() {
-        if (points == -150) {
+        if (health == 0) {
             Activity a = (Activity) context;
             Intent intent = new Intent(a, GameOverActivity.class);
             a.startActivity(intent);
@@ -168,6 +170,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             points += 1;
         } else if (isBlinded) {
             points -= 1;
+            health -= 1;
         }
     }
 
@@ -244,6 +247,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setTextSize(200);
 
             canvas.drawText(Integer.toString(points), 15, 200, paint);
+
+            canvas.drawText(Integer.toString(health), winWidth - 340, 200, paint);
         }
     }
 
